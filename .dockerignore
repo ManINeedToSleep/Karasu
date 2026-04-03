@@ -1,0 +1,4 @@
+karusu.tar.gz
+*.tar.gz
+.env
+.git

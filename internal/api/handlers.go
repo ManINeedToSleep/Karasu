@@ -320,6 +320,7 @@ func (h *Handler) syncDiscography(artist *models.Artist) {
 			MusicBrainzID: rg.ID,
 			ReleaseDate:   releaseDate,
 			AlbumType:     normalizeAlbumType(rg.PrimaryType),
+			CoverURL:      metadata.GetCoverArtURL(rg.ID),
 			Status:        models.AlbumStatusWanted,
 		}
 
