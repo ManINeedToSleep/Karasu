@@ -7,7 +7,9 @@ import (
 
 	"github.com/gin-gonic/gin"
 	"github.com/joho/godotenv"
+	"karusu/internal/api"
 	"karusu/internal/db"
+	"karusu/internal/metadata"
 )
 
 func main() {
@@ -35,11 +37,16 @@ func main() {
 	}
 	defer database.Close()
 
+	mb := metadata.NewMusicBrainzClient()
+	h := api.NewHandler(database, mb)
+
 	// Set up the HTTP router
 	r := gin.Default()
 
 	// Trust only localhost proxy
 	r.SetTrustedProxies([]string{"127.0.0.1"})
+
+	h.RegisterRoutes(r)
 
 	r.GET("/health", func(c *gin.Context) {
 		c.JSON(200, gin.H{
