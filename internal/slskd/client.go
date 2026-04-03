@@ -223,11 +223,12 @@ type DownloadRequest struct {
 }
 
 // EnqueueDownload tells slskd to download a specific file from a specific user
+// slskd expects an array of requests
 func (c *Client) EnqueueDownload(username, filename string, size int64) error {
 	return c.do(
 		"POST",
 		fmt.Sprintf("/api/v0/transfers/downloads/%s", username),
-		DownloadRequest{Filename: filename, Size: size},
+		[]DownloadRequest{{Filename: filename, Size: size}},
 		nil,
 	)
 }

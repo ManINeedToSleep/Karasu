@@ -160,16 +160,14 @@ func pickBestResult(results []slskd.SearchResult, album *models.Album, tracks []
 	var best *scoredResult
 
 	for _, r := range results {
-		// Skip users with no free upload slots
-		if r.FreeUploadSlots == 0 {
-			continue
-		}
-
 		// Filter to only audio files
 		audioFiles := filterAudioFiles(r.Files)
 		if len(audioFiles) == 0 {
 			continue
 		}
+
+		log.Printf("[Karusu] Result from %s: %d audio files, %d free slots, speed=%d",
+			r.Username, len(audioFiles), r.FreeUploadSlots, r.UploadSpeed)
 
 		score := scoreResult(r, audioFiles, album, tracks)
 
@@ -195,6 +193,11 @@ func scoreResult(r slskd.SearchResult, files []slskd.FileResult, album *models.A
 
 	// Free slots bonus
 	score += r.FreeUploadSlots * 10
+
+	// Penalize users with no free slots but don't skip them entirely
+	if r.FreeUploadSlots == 0 {
+		score -= 20
+	}
 
 	// Check file formats — FLAC is king
 	hasFlac := false
