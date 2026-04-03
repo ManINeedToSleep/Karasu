@@ -1,4 +1,4 @@
-package api
+package library
 
 import (
 	"strings"

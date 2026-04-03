@@ -312,14 +312,14 @@ func (h *Handler) syncDiscography(artist *models.Artist) {
 		}
 
 		// Parse release date — MusicBrainz dates can be partial e.g. "2015" or "2015-03"
-		releaseDate := parsePartialDate(rg.FirstRelease)
+		releaseDate := ParsePartialDate(rg.FirstRelease)
 
 		album := &models.Album{
 			ArtistID:      artist.ID,
 			Title:         rg.Title,
 			MusicBrainzID: rg.ID,
 			ReleaseDate:   releaseDate,
-			AlbumType:     normalizeAlbumType(rg.PrimaryType),
+			AlbumType:     NormalizeAlbumType(rg.PrimaryType),
 			CoverURL:      metadata.GetCoverArtURL(rg.ID),
 			Status:        models.AlbumStatusWanted,
 		}

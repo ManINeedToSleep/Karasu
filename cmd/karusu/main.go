@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"log"
 	"os"
+	"time"
 
 	"github.com/gin-gonic/gin"
 	"github.com/joho/godotenv"
@@ -48,6 +49,10 @@ func main() {
 	downloader := library.NewDownloader(database, slskdClient, organizer)
 
 	mb := metadata.NewMusicBrainzClient()
+
+	// Start the monitoring loop — checks for new releases every 24 hours
+	monitor := library.NewMonitor(database, mb, downloader, 24*time.Hour)
+	monitor.Start()
 	h := api.NewHandler(database, mb, downloader)
 
 	// Set up the HTTP router
