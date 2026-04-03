@@ -17,6 +17,9 @@ const (
 	// when a wildcard search matches too broadly
 	MaxFilesPerDownload = 50
 )
+
+// Downloader manages the full pipeline of searching, downloading, and organizing music
+type Downloader struct {
 	db        *db.DB
 	slskd     *slskd.Client
 	organizer *Organizer
