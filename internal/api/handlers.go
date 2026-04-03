@@ -17,12 +17,13 @@ import (
 type Handler struct {
 	db         *db.DB
 	mb         *metadata.MusicBrainzClient
+	fanart     *metadata.FanartClient
 	downloader *library.Downloader
 }
 
 // NewHandler creates a new Handler
-func NewHandler(db *db.DB, mb *metadata.MusicBrainzClient, downloader *library.Downloader) *Handler {
-	return &Handler{db: db, mb: mb, downloader: downloader}
+func NewHandler(db *db.DB, mb *metadata.MusicBrainzClient, fanart *metadata.FanartClient, downloader *library.Downloader) *Handler {
+	return &Handler{db: db, mb: mb, fanart: fanart, downloader: downloader}
 }
 
 // RegisterRoutes wires up all API routes to the gin router
@@ -137,6 +138,15 @@ func (h *Handler) addArtist(c *gin.Context) {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": "failed to save artist"})
 		return
 	}
+
+	// Fetch artist image from Fanart.tv in the background
+	go func() {
+		imageURL, err := h.fanart.GetArtistImageURL(artist.MusicBrainzID)
+		if err == nil && imageURL != "" {
+			artist.ImageURL = imageURL
+			h.db.UpdateArtist(artist)
+		}
+	}()
 
 	// Fetch and save their discography in the background
 	go h.syncDiscography(artist)
